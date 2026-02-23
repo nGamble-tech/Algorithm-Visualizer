@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pathfinder Visualizer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Pathfinder</h1>
+      <div class="controls">
+        <select id="algo">
+          <option value="bfs">BFS</option>
+          <option value="dfs">DFS</option>
+          <option value="dijkstra">Dijkstra</option>
+          <option value="astar">A*</option>
+        </select>
+        <button id="run">Run</button>
+        <button id="clear">Clear</button>
+      </div>
+    </header>
+
+    <canvas id="canvas" width="900" height="600"></canvas>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
