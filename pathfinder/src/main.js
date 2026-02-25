@@ -3,6 +3,9 @@ import { draw } from "./renderer.js";
 import { setupInput } from "./input.js";
 import { bfs } from "./algorithms/bfs.js";
 import { resetSearch } from "./grid.js";
+import { dfs } from "./algorithms/dfs.js";
+import { dijkstra } from "./algorithms/dijkstra.js";
+
 
 console.log("main.js loaded");
 const canvas = document.getElementById("canvas");
@@ -57,10 +60,20 @@ function markPath() {
 setupInput(canvas, grid, CELL, render);
 
 document.getElementById("run").addEventListener("click", () => {
-  animationToken++;
   resetSearch(grid);
-  const generator = bfs(grid, start, end);
-  animate(generator);
+
+  const choice = document.getElementById("algo").value;
+
+  let gen;
+  if (choice === "bfs") gen = bfs(grid, start, end);
+  else if (choice === "dfs") gen = dfs(grid, start, end);
+  else if (choice === "dijkstra") gen = dijkstra(grid, start, end);
+  else {
+    // A* later
+    gen = bfs(grid, start, end);
+  }
+
+  animate(gen);
 });
 
 document.getElementById("clear").addEventListener("click", () => {

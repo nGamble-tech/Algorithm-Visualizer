@@ -25,6 +25,7 @@ export function resetSearch(grid) {
     for (const cell of row) {
       cell.visited = false;
       cell.inFrontier = false;
+      cell.isPath = false;
       cell.dist = Infinity;
       cell.f = Infinity;
       cell.prev = null;

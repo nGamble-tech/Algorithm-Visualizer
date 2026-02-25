@@ -15,12 +15,12 @@ Currently implemented:
 - Grid rendering
 - Wall drawing (click and drag)
 - Animated Breadth-First Search (BFS)
+- Animated Depth-First Search (DFS)
+- Animated Dijkstra's Algorithm
 - Automatic shortest path reconstruction
 
 Planned additions:
 
-- Depth-First Search (DFS)
-- Dijkstra’s Algorithm
 - A\* Search
 - Speed controls
 - Maze generation
