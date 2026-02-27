@@ -2,7 +2,7 @@ import { makeGrid } from "./grid.js";
 import { draw } from "./renderer.js";
 import { setupInput } from "./input.js";
 import { bfs } from "./algorithms/bfs.js";
-import { resetSearch } from "./grid.js";
+import { clearWallsAndWeights, resetSearch } from "./grid.js";
 import { dfs } from "./algorithms/dfs.js";
 import { dijkstra } from "./algorithms/dijkstra.js";
 import { astar } from "./algorithms/astar.js";
@@ -19,9 +19,21 @@ const cols = Math.floor(canvas.width / CELL);
 
 let grid = makeGrid(rows, cols);
 let animationToken = 0;
+let isRunning = false;
 
 let start = { r: 5, c: 5 };
 let end = { r: rows - 6, c: cols - 6 };
+let selectedTool = document.getElementById("tool").value;
+let weightValue = Number(document.getElementById("weight").value) || 5;
+const speedInput = document.getElementById("speed");
+let speedMs = sliderToDelay(speedInput);
+
+function sliderToDelay(input) {
+  const min = Number(input.min) || 1;
+  const max = Number(input.max) || 60;
+  const value = Number(input.value) || min;
+  return max - value + min;
+}
 
 function render() {
   draw(ctx, grid, CELL, start, end);
@@ -29,17 +41,22 @@ function render() {
 
 function animate(generator) {
   const token = ++animationToken;
+  isRunning = true;
 
   function step() {
-    if (token !== animationToken) return;
+    if (token !== animationToken) {
+      isRunning = false;
+      return;
+    }
 
     const result = generator.next();
 
     if (!result.done) {
       markPath();
       render();
-      setTimeout(step, 20);
+      setTimeout(step, speedMs);
     } else {
+      isRunning = false;
       render();
     }
   }
@@ -59,9 +76,34 @@ function markPath() {
   }
 }
 
-setupInput(canvas, grid, CELL, render);
+setupInput(
+  canvas,
+  grid,
+  CELL,
+  () => ({
+    tool: selectedTool,
+    weightValue,
+    start,
+    end,
+    isRunning,
+  }),
+  render
+);
+
+document.getElementById("tool").addEventListener("change", (e) => {
+  selectedTool = e.target.value;
+});
+
+document.getElementById("weight").addEventListener("input", (e) => {
+  weightValue = Math.max(1, Number(e.target.value) || 1);
+});
+
+document.getElementById("speed").addEventListener("input", () => {
+  speedMs = sliderToDelay(speedInput);
+});
 
 document.getElementById("run").addEventListener("click", () => {
+  animationToken++;
   resetSearch(grid);
 
   const choice = document.getElementById("algo").value;
@@ -76,15 +118,25 @@ document.getElementById("run").addEventListener("click", () => {
   animate(gen);
 });
 
-document.getElementById("clear").addEventListener("click", () => {
+document.getElementById("clearSearch").addEventListener("click", () => {
   animationToken++;
-  grid = makeGrid(rows, cols);
-  setupInput(canvas, grid, CELL, render);
+  isRunning = false;
+  resetSearch(grid);
+  render();
+});
+
+document.getElementById("clearWalls").addEventListener("click", () => {
+  animationToken++;
+  isRunning = false;
+  clearWallsAndWeights(grid);
+  resetSearch(grid);
   render();
 });
 
 document.getElementById("maze").addEventListener("click", () => {
   animationToken++;
+  isRunning = false;
+  clearWallsAndWeights(grid);
   generateDfsMaze(grid, start, end);
   resetSearch(grid);
   render();
