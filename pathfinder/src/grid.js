@@ -6,6 +6,7 @@ export function makeGrid(rows, cols) {
       row.push({
         r, c,
         isWall: false,
+        weight: 1, // cost to enter is >=1
         visited: false,
         inFrontier: false,
         dist: Infinity,
@@ -30,6 +31,15 @@ export function resetSearch(grid) {
       cell.f = Infinity;
       cell.prev = null;
       cell.isPath = false;
+    }
+  }
+}
+
+export function clearWallsAndWeights(grid) {
+  for (const row of grid) {
+    for (const cell of row) {
+      cell.isWall = false;
+      cell.weight = 1;
     }
   }
 }

@@ -1,18 +1,19 @@
 import { MinPriorityQueue } from "../utils/pq.js";
+import { manhattan } from "../utils/heuristics.js";
 
-export function* dijkstra(grid, start, end) {
+export function* astar(grid, start, end) {
   const pq = new MinPriorityQueue();
   const startCell = grid[start.r][start.c];
   const endCell = grid[end.r][end.c];
 
-  startCell.dist = 0;
-  pq.push(startCell, 0);
+  startCell.dist = 0; // g
+  startCell.f = manhattan(startCell, endCell); // f = g + h
+  pq.push(startCell, startCell.f);
   startCell.inFrontier = true;
 
   while (pq.size() > 0) {
     const current = pq.pop();
 
-    // Skip if already finalized
     if (current.visited) continue;
 
     current.visited = true;
@@ -21,17 +22,19 @@ export function* dijkstra(grid, start, end) {
 
     if (current === endCell) return;
 
-    const neighbors = getNeighbors(grid, current);
-
-    for (const neighbor of neighbors) {
+    for (const neighbor of getNeighbors(grid, current)) {
       if (neighbor.isWall || neighbor.visited) continue;
 
-     const alt = current.dist + neighbor.weight; // Updated 
+      const tentativeG = current.dist + neighbor.weight;
 
-      if (alt < neighbor.dist) {
-        neighbor.dist = alt;
+      if (tentativeG < neighbor.dist) {
+        neighbor.dist = tentativeG;
         neighbor.prev = current;
-        pq.push(neighbor, neighbor.dist);
+
+        const h = manhattan(neighbor, endCell);
+        neighbor.f = tentativeG + h;
+
+        pq.push(neighbor, neighbor.f);
         neighbor.inFrontier = true;
       }
     }
@@ -39,13 +42,7 @@ export function* dijkstra(grid, start, end) {
 }
 
 function getNeighbors(grid, cell) {
-  const dirs = [
-    [1, 0],
-    [-1, 0],
-    [0, 1],
-    [0, -1],
-  ];
-
+  const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
   const out = [];
   for (const [dr, dc] of dirs) {
     const r = cell.r + dr;

@@ -5,6 +5,8 @@ import { bfs } from "./algorithms/bfs.js";
 import { resetSearch } from "./grid.js";
 import { dfs } from "./algorithms/dfs.js";
 import { dijkstra } from "./algorithms/dijkstra.js";
+import { astar } from "./algorithms/astar.js";
+import { generateDfsMaze } from "./mazes/dfsMaze.js";
 
 
 console.log("main.js loaded");
@@ -68,10 +70,8 @@ document.getElementById("run").addEventListener("click", () => {
   if (choice === "bfs") gen = bfs(grid, start, end);
   else if (choice === "dfs") gen = dfs(grid, start, end);
   else if (choice === "dijkstra") gen = dijkstra(grid, start, end);
-  else {
-    // A* later
-    gen = bfs(grid, start, end);
-  }
+  else if (choice === "astar") gen = astar(grid, start, end);
+  else gen = bfs(grid, start, end);
 
   animate(gen);
 });
@@ -80,6 +80,13 @@ document.getElementById("clear").addEventListener("click", () => {
   animationToken++;
   grid = makeGrid(rows, cols);
   setupInput(canvas, grid, CELL, render);
+  render();
+});
+
+document.getElementById("maze").addEventListener("click", () => {
+  animationToken++;
+  generateDfsMaze(grid, start, end);
+  resetSearch(grid);
   render();
 });
 
